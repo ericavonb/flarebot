@@ -64,8 +64,8 @@ func main() {
 			Origin:      os.Getenv("JIRA_ORIGIN"),
 			Username:    os.Getenv("JIRA_USERNAME"),
 			Password:    os.Getenv("JIRA_PASSWORD"),
-			ProjectID:   os.Getenv("JIRA_PROJECT_ID"),
-			IssueTypeID: os.Getenv("JIRA_ISSUETYPE_ID"),
+			ProjectKey:  os.Getenv("JIRA_PROJECT_KEY"),
+			IssueType:   os.Getenv("JIRA_ISSUETYPE"),
 			PriorityIDs: strings.Split(os.Getenv("JIRA_PRIORITIES"), ","),
 		},
 	}
