@@ -166,8 +166,8 @@ func main() {
 	}
 	domain := os.Getenv("SLACK_DOMAIN")
 	username := os.Getenv("SLACK_USERNAME")
-
-	client, err := slack.NewClient(accessToken, domain, username)
+	channelAccessToken := os.Getenv("SLACK_USER_ACCESS_TOKEN")
+	client, err := slack.NewClient(accessToken, domain, username, channelAccessToken)
 	if err != nil {
 		panic(err)
 	}

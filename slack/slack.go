@@ -9,14 +9,14 @@ import (
 	"regexp"
 	"sync"
 
-	"golang.org/x/oauth2"
-
 	slk "github.com/nlopes/slack"
+	"golang.org/x/oauth2"
 )
 
 type Client struct {
 	rtm              *slk.RTM
 	API              *slk.Client
+	channelAPI       *slk.Client
 	Username, userId string
 
 	mHandler sync.RWMutex
@@ -53,13 +53,15 @@ func (c *Client) Stop() {
 	c.wg.Wait()
 }
 
-func (c *Client) CreateChannel(name string) (*slk.Channel, error) {
-	channel, err := c.API.CreateChannel(name)
+func (c *Client) CreateChannel(name, topic string) (*slk.Channel, error) {
+	channel, err := c.channelAPI.CreateChannel(name)
 	if err != nil {
 		return nil, err
-	} else {
-		return channel, nil
 	}
+	if _, err = c.channelAPI.InviteUserToChannel(channel.ID, c.userId); err != nil {
+		return nil, err
+	}
+	return c.channelAPI.SetChannelTopic(channel.ID, topic)
 }
 
 func (c *Client) Hear(pattern string, fn func(*Message, [][]string)) {
@@ -225,9 +227,8 @@ func (c *Client) start() {
 	}(c.rtm)
 }
 
-func NewClient(token, domain, username string) (*Client, error) {
+func NewClient(token, domain, username, channelAccessToken string) (*Client, error) {
 	api := slk.New(token)
-
 	users, err := api.GetUsers()
 	if err != nil {
 		return nil, err
@@ -241,7 +242,21 @@ func NewClient(token, domain, username string) (*Client, error) {
 	}
 
 	rtm := api.NewRTM()
-	client := &Client{API: api, rtm: rtm, Username: username, userId: userId}
+	var channelAPI *slk.Client
+	if channelAccessToken != "" {
+		channelAPI = slk.New(channelAccessToken)
+	} else {
+		channelAPI = api
+	}
+
+	client := &Client{
+		API:        api,
+		channelAPI: channelAPI,
+		rtm:        rtm,
+		Username:   username,
+		userId:     userId,
+	}
+
 	client.start()
 	return client, nil
 }
