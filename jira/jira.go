@@ -66,8 +66,8 @@ type JiraServer struct {
 	Origin      string
 	Username    string
 	Password    string
-	ProjectID   string
-	IssueTypeID string
+	ProjectKey  string
+	IssueType   string
 	PriorityIDs []string
 }
 
@@ -152,17 +152,17 @@ func (server *JiraServer) CreateTicket(priority int, topic string, assignee *Use
 	request := map[string]interface{}{
 		"fields": &map[string]interface{}{
 			"project": &map[string]interface{}{
-				"id": server.ProjectID,
+				"key": server.ProjectKey,
 			},
 			"issuetype": &map[string]interface{}{
-				"id": server.IssueTypeID,
+				"name": server.IssueType,
 			},
 			"assignee": &map[string]interface{}{
 				"name": assignee.Name,
 			},
 			"summary": topic,
 			"priority": &map[string]interface{}{
-				"id": server.PriorityIDs[priority],
+				"id": fmt.Sprintf("%d", priority),
 			},
 		},
 	}

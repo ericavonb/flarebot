@@ -6,8 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Clever/flarebot/slack"
 	"github.com/spf13/cobra"
+
+	"github.com/Clever/flarebot/slack"
 )
 
 type slackCommand struct {
@@ -33,7 +34,7 @@ func (sc *slackCommand) CreateChannelCommand(cmd *cobra.Command, args []string) 
 		log.Fatalf("A channel name must be provided\n")
 	}
 
-	channel, err := sc.client.CreateChannel(args[0])
+	channel, err := sc.client.CreateChannel(args[0], "test")
 	if err != nil {
 		log.Fatal(err)
 	}
